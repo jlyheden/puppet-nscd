@@ -1,6 +1,6 @@
 {
   "name": "artisol-nscd",
-  "author": "Johan Lyheden \u003cjohan.lyheden@artificial-solutions.com\u003e",
+  "author": "Johan Lyheden",
   "description": "",
   "license": "",
   "project_page": "",
@@ -8,14 +8,20 @@
   "summary": "",
   "version": "0.0.1",
   "checksums": {
-    "Modulefile": "59d3f3b03070385b1444b33c2c6e9133",
+    "Modulefile": "6b248f826b3a3e6648fc76bc2f3ae28c",
     "README.markdown": "3065634e12a8963aa8bd12e610dac166",
     "Rakefile": "f37e6131fe7de9a49b09d31596f5fbf1",
-    "manifests/init.pp": "ffd657e809e5b0c0f92239ccb7a4dfac",
-    "manifests/params.pp": "de8035a91d7a60cfe881b105c5d0c805",
+    "manifests/init.pp": "f85cf54518a8e1b372b5ecf1c87f6b51",
+    "manifests/params.pp": "d0474e736bbfe95304347651f48398a5",
     "spec/spec.opts": "a600ded995d948e393fbe2320ba8e51c",
     "spec/spec_helper.rb": "3ea886dd135e120afa31e0aab12e85b0",
+    "templates/nscd.conf.erb": "395c799b97ea7c065190d3f6f56349a0",
     "tests/init.pp": "4fd8b03ec6053116405028c363409902"
   },
-  "dependencies": []
+  "dependencies": [
+    {
+      "name": "puppetlabs/stdlib",
+      "version_requirement": "\u003d\u003d3.2.0"
+    }
+  ]
 }

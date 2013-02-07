@@ -1,0 +1,77 @@
+# MANAGED BY PUPPET
+
+# Global settings
+<%- if parameters_real.keys.length > 0
+parameters_real.sort_by { |k,v| k}.each_pair do |k,v| -%>
+<%= k %> <%= v %>
+<%- end
+} else { -%>
+debug-level 0
+paranoia no
+} -%>
+
+# Passwd settings
+<%- if parameters_passwd_real.keys.length > 0
+parameters_passwd_real.sort_by { |k,v| k}.each_pair do |k,v| -%>
+<%= k %> passwd <%= v %>
+<%- end
+} else { -%>
+enable-cache passwd yes
+positive-time-to-live passwd 600
+negative-time-to-live passwd 20
+suggested-size passwd 211
+check-files passwd yes
+persistent passwd yes
+shared passwd yes
+max-db-size passwd 33554432
+auto-propagate passwd yes
+} -%>
+
+# Group settings
+<%- if parameters_group_real.keys.length > 0
+parameters_group_real.sort_by { |k,v| k}.each_pair do |k,v| -%>
+<%= k %> group <%= v %>
+<%- end
+} else { -%>
+enable-cache group yes
+positive-time-to-live group 3600
+negative-time-to-live group 60
+suggested-size group 211
+check-files group yes
+persistent group yes
+shared group yes
+max-db-size group 33554432
+auto-propagate group yes
+} -%>
+
+# Hosts settings
+<%- if parameters_hosts_real.keys.length > 0
+parameters_hosts_real.sort_by { |k,v| k}.each_pair do |k,v| -%>
+<%= k %> hosts <%= v %>
+<%- end
+} else { -%>
+enable-cache hosts no
+positive-time-to-live hosts 3600
+negative-time-to-live hosts 20
+suggested-size hosts 211
+check-files hosts yes
+persistent hosts yes
+shared hosts yes
+max-db-size hosts 33554432
+} -%>
+
+# Services settings
+<%- if parameters_services_real.keys.length > 0
+parameters_services_real.sort_by { |k,v| k}.each_pair do |k,v| -%>
+<%= k %> services <%= v %>
+<%- end
+} else { -%>
+enable-cache services yes
+positive-time-to-live services 28800
+negative-time-to-live services 20
+suggested-size services 211
+check-files services yes
+persistent services yes
+shared services yes
+max-db-size services 33554432
+} -%>
