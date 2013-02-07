@@ -1,0 +1,3 @@
+class nscd::params {
+  
+}
