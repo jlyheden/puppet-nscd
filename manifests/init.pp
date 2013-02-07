@@ -63,34 +63,33 @@ class nscd (  $ensure = 'UNDEF',
     'UNDEF' => $nscd::params::source_dir_purge,
     default => $source_dir_purge
   }
+  $empty_hash = {}
   $parameters_real = $parameters ? {
-    'UNDEF' => {},
+    'UNDEF' => $empty_hash,
     default => $parameters
   }
   $parameters_passwd_real = $parameters_passwd ? {
-    'UNDEF' => {},
+    'UNDEF' => $empty_hash,
     default => $parameters_passwd
   }
   $parameters_group_real = $parameters_group ? {
-    'UNDEF' => {},
+    'UNDEF' => $empty_hash,
     default => $parameters_group
   }
   $parameters_hosts_real = $parameters_hosts ? {
-    'UNDEF' => {},
+    'UNDEF' => $empty_hash,
     default => $parameters_hosts
   }
   $parameters_services_real = $parameters_services ? {
-    'UNDEF' => {},
+    'UNDEF' => $empty_hash,
     default => $parameters_services
   }
 
-  validate_re($ensure_real, [ 'present', 'absent' ])
+  validate_re($ensure_real,[ 'present', 'absent' ])
   validate_bool($disable_real)
   validate_bool($disableboot_real)
   validate_bool($autoupgrade_real)
   validate_bool($autorestart_real)
-  validate_re($source_real, [ '^puppet:///', undef ])
-  validate_re($template_real, [ '^[a-z][a-z0-9\_]+\/.*', undef])
   validate_hash($parameters_real)
 
   if $source_dir_real != undef {
@@ -128,10 +127,13 @@ class nscd (  $ensure = 'UNDEF',
       if $autorestart_real == true {
         Service['nscd/service'] { subscribe => File['nscd/config'] }
       }
+      if $template_real != undef {
+        File['nscd/config'] { content => template($template_real) }
+      }
       File {
         owner   => root,
         group   => root,
-        mode    => '0755',
+        mode    => '0644',
         require => Package['nscd'],
         before  => Service['nscd/service']
       }
@@ -142,7 +144,6 @@ class nscd (  $ensure = 'UNDEF',
       file { 'nscd/config':
         ensure  => present,
         path    => $nscd::params::config_file,
-        content => $template_real,
         source  => $source_real
       }
       file { 'nscd/run/dir':
