@@ -1,14 +1,93 @@
-# Class: nscd
+# == Class: nscd
 #
-# This module manages nscd
+# This module manages the NSCD service. The Name Service Cache Daemon is traditionally
+# installed on systems that are configured to use external data sources such as LDAP
+# and NIS. NSCD provides caching which reduces latency on lookup requests as well as reducing
+# load on the external data source.
 #
-# Parameters: none
+# === Parameters
 #
-# Actions:
+# [*ensure*]
+#   Controls the software installation
+#   Valid values: <tt>present</tt>, <tt>absent</tt>, <tt>purge</tt>
 #
-# Requires: see Modulefile
+# [*service_enable*]
+#   Controls if service should be enabled on boot
+#   Valid values: <tt>true</tt>, <tt>false</tt>
 #
-# Sample Usage:
+# [*service_status*]
+#   Controls service state.
+#   Valid values: <tt>running</tt>, <tt>stopped</tt>, <tt>unmanaged</tt>
+#
+# [*autoupgrade*]
+#   If Puppet should upgrade the software automatically
+#   Valid values: <tt>true</tt>, <tt>false</tt>
+#
+# [*autorestart*]
+#   If Puppet should restart service on config changes
+#   Valid values: <tt>true</tt>, <tt>false</tt>
+#
+# [*source*]
+#   Path to static Puppet file to use
+#   Valid values: <tt>puppet:///modules/mymodule/path/to/file.conf</tt>
+#
+# [*template*]
+#   Path to ERB puppet template file to use
+#   Valid values: <tt>mymodule/path/to/file.conf.erb</tt>
+#
+# [*source_dir*]
+#   Not used
+#
+# [*source_dir_purge*]
+#   Not used
+#
+# [*parameters*]
+#   Global nscd settings (man 5 nscd.conf)
+#   Valid values: hash, ex:  <tt>{ 'option' => 'value' }</tt>
+#
+# [*parameters_passwd*]
+#   Passwd section in nscd settings (man 5 nscd.conf)
+#   Valid values: hash ,ex: <tt>{ 'options' => 'value' }</tt>
+#
+# [*parameters_group*]
+#   Group section in nscd settings (man 5 nscd.conf)
+#   Valid values: hash ,ex: <tt>{ 'options' => 'value' }</tt>
+#
+# [*parameters_hosts*]
+#   Hosts section in nscd settings (man 5 nscd.conf)
+#   Valid values: hash ,ex: <tt>{ 'options' => 'value' }</tt>
+#
+# [*parameters_services*]
+#   Services section in nscd settings (man 5 nscd.conf)
+#   Valid values: hash ,ex: <tt>{ 'options' => 'value' }</tt>
+#
+# === Sample Usage
+#
+# * Installing with default settings
+#   class { 'nscd': }
+#
+# * Uninstalling the software
+#   class { 'nscd': ensure => absent }
+#
+# * Installing, with service disabled on boot and using custom passwd settings
+#   class { 'nscd:
+#     service_enable    => false,
+#     parameters_passwd => {
+#       'enable-cache'  => 'no'
+#     }
+#   }
+#
+# === Supported platforms
+#
+# This module has been tested on the following platforms
+# * Ubuntu LTS 10.04
+#
+# To add support for other platforms, edit the params.pp file and provide
+# settings for that platform.
+#
+# === Author
+#
+# Johan Lyheden <johan.lyheden@artificial-solutions.com>
 #
 class nscd (  $ensure = $nscd::params::ensure,
               $service_enable = $nscd::params::service_enable,
@@ -25,18 +104,22 @@ class nscd (  $ensure = $nscd::params::ensure,
               $parameters_hosts = {},
               $parameters_services = {} ) inherits nscd::params {
 
+  # Input validation
   validate_re($ensure,[ 'present', 'absent', 'purge' ])
   validate_re($service_status, [ 'running', 'stopped', 'unmanaged' ])
   validate_bool($autoupgrade)
   validate_bool($autorestart)
   validate_hash($parameters)
 
-  # unmanaged is a non-standard service ensure value - wrap around it
+  # 'unmanaged' is an unknown service state
   $service_status_real = $service_status ? {
     'unmanaged' => undef,
     default     => $service_status
   }
 
+  # source_dir and source_dir_purge is provided as default
+  # however for this service which only relies on one
+  # configuration file, it does not make sense
   if $source_dir != undef {
     notice("Parameter ${source_dir} is currently not used in this module.")
   }
@@ -44,6 +127,7 @@ class nscd (  $ensure = $nscd::params::ensure,
     notice("Parameter ${source_dir_purge} is currently not used in this module.")
   }
 
+  # Manages automatic upgrade behavior
   if $ensure == 'present' and $autoupgrade == true {
     $ensure_package = 'latest'
   } else {
@@ -51,6 +135,8 @@ class nscd (  $ensure = $nscd::params::ensure,
   }
 
   case $ensure {
+
+    # If software should be installed
     present: {
       if $autoupgrade == true {
         Package['nscd'] { ensure => latest }
@@ -91,10 +177,16 @@ class nscd (  $ensure = $nscd::params::ensure,
         path    => $nscd::params::cache_dir
       }
     }
+    
+    # If software should be uninstalled
     absent,purge: {
       Package['nscd'] { ensure => $ensure }
     }
-    default: {}
+    
+    # Catch all, should not end up here due to input validation
+    default: {
+      fail("Unsupported ensure value ${ensure}")
+    }
   }
   
   package { 'nscd':
