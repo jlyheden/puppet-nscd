@@ -103,9 +103,6 @@ class nscd (  $ensure = 'UNDEF',
   } else {
     $ensure_package = $ensure
   }
-  if $source_real != undef and $template_real != undef {
-    fail('Parameter source and template cannot be set at the same time.')
-  }
 
   case $ensure {
     present: {
@@ -127,8 +124,10 @@ class nscd (  $ensure = 'UNDEF',
       if $autorestart_real == true {
         Service['nscd/service'] { subscribe => File['nscd/config'] }
       }
-      if $template_real != undef {
+      if $source_real == undef {
         File['nscd/config'] { content => template($template_real) }
+      } else {
+        File['nscd/config'] { source => $source_real }
       }
       File {
         owner   => root,
@@ -144,7 +143,6 @@ class nscd (  $ensure = 'UNDEF',
       file { 'nscd/config':
         ensure  => present,
         path    => $nscd::params::config_file,
-        source  => $source_real
       }
       file { 'nscd/run/dir':
         ensure  => directory,
