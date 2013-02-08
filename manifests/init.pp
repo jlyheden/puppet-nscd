@@ -12,7 +12,7 @@
 #
 class nscd (  $ensure = $nscd::params::ensure,
               $service_enable = $nscd::params::service_enable,
-              $service_ensure = $nscd::params::service_ensure,
+              $service_status = $nscd::params::service_status,
               $autoupgrade = $nscd::params::autoupgrade,
               $autorestart = $nscd::params::autorestart,
               $source = $nscd::params::source,
@@ -26,9 +26,16 @@ class nscd (  $ensure = $nscd::params::ensure,
               $parameters_services = {} ) inherits nscd::params {
 
   validate_re($ensure,[ 'present', 'absent', 'purge' ])
+  validate_re($service_status, [ 'running', 'stopped', 'unmanaged' ])
   validate_bool($autoupgrade)
   validate_bool($autorestart)
   validate_hash($parameters)
+
+  # unmanaged is a non-standard service ensure value - wrap around it
+  $service_status_real = $service_status ? {
+    'unmanaged' => undef,
+    default     => $service_status
+  }
 
   if $source_dir != undef {
     notice("Parameter ${source_dir} is currently not used in this module.")
@@ -66,7 +73,7 @@ class nscd (  $ensure = $nscd::params::ensure,
         before  => Service['nscd/service']
       }
       service { 'nscd/service':
-        ensure  => $service_ensure,
+        ensure  => $service_status_real,
         name    => $nscd::params::service,
         enable  => $service_enable,
         require => [ Package['nscd'], File['nscd/config' ] ]
