@@ -1,7 +1,7 @@
 class nscd::params {
   $ensure = present
-  $disable = false
-  $disableboot = false
+  $service_enable = true
+  $service_ensure = running
   $autoupgrade = false
   $autorestart = true
   $source = undef

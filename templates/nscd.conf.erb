@@ -1,8 +1,8 @@
 # MANAGED BY PUPPET
 
 # Global settings
-<%- if parameters_real.keys.length > 0
-parameters_real.sort_by { |k,v| k}.each do |k,v| -%>
+<%- if parameters.keys.length > 0
+parameters.sort_by { |k,v| k}.each do |k,v| -%>
 <%= k %> <%= v %>
 <%- end
 else -%>
@@ -11,8 +11,8 @@ paranoia no
 <%- end -%>
 
 # Passwd settings
-<%- if parameters_passwd_real.keys.length > 0
-parameters_passwd_real.sort_by { |k,v| k}.each do |k,v| -%>
+<%- if parameters_passwd.keys.length > 0
+parameters_passwd.sort_by { |k,v| k}.each do |k,v| -%>
 <%= k %> passwd <%= v %>
 <%- end
 else -%>
@@ -28,8 +28,8 @@ auto-propagate passwd yes
 <%- end -%>
 
 # Group settings
-<%- if parameters_group_real.keys.length > 0
-parameters_group_real.sort_by { |k,v| k}.each do |k,v| -%>
+<%- if parameters_group.keys.length > 0
+parameters_group.sort_by { |k,v| k}.each do |k,v| -%>
 <%= k %> group <%= v %>
 <%- end
 else -%>
@@ -45,8 +45,8 @@ auto-propagate group yes
 <%- end -%>
 
 # Hosts settings
-<%- if parameters_hosts_real.keys.length > 0
-parameters_hosts_real.sort_by { |k,v| k}.each do |k,v| -%>
+<%- if parameters_hosts.keys.length > 0
+parameters_hosts.sort_by { |k,v| k}.each do |k,v| -%>
 <%= k %> hosts <%= v %>
 <%- end
 else -%>
@@ -61,8 +61,8 @@ max-db-size hosts 33554432
 <%- end -%>
 
 # Services settings
-<%- if parameters_services_real.keys.length > 0
-parameters_services_real.sort_by { |k,v| k}.each do |k,v| -%>
+<%- if parameters_services.keys.length > 0
+parameters_services.sort_by { |k,v| k}.each do |k,v| -%>
 <%= k %> services <%= v %>
 <%- end
 else -%>

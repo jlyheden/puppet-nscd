@@ -11,11 +11,11 @@
     "Modulefile": "6b248f826b3a3e6648fc76bc2f3ae28c",
     "README.markdown": "3065634e12a8963aa8bd12e610dac166",
     "Rakefile": "f37e6131fe7de9a49b09d31596f5fbf1",
-    "manifests/init.pp": "f85cf54518a8e1b372b5ecf1c87f6b51",
-    "manifests/params.pp": "d0474e736bbfe95304347651f48398a5",
+    "manifests/init.pp": "4350e7ea777fb42fe27c89dffb72cebd",
+    "manifests/params.pp": "58a0475541e827f59aa2b340f9170a43",
     "spec/spec.opts": "a600ded995d948e393fbe2320ba8e51c",
     "spec/spec_helper.rb": "3ea886dd135e120afa31e0aab12e85b0",
-    "templates/nscd.conf.erb": "395c799b97ea7c065190d3f6f56349a0",
+    "templates/nscd.conf.erb": "2b45ec53e8c8b83e0a61629b6b7a493d",
     "tests/init.pp": "4fd8b03ec6053116405028c363409902"
   },
   "dependencies": [
