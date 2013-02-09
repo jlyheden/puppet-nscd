@@ -35,12 +35,6 @@
 #   Path to ERB puppet template file to use
 #   Valid values: <tt>mymodule/path/to/file.conf.erb</tt>
 #
-# [*source_dir*]
-#   Not used
-#
-# [*source_dir_purge*]
-#   Not used
-#
 # [*parameters*]
 #   Global nscd settings (man 5 nscd.conf)
 #   Valid values: hash, ex:  <tt>{ 'option' => 'value' }</tt>
@@ -96,8 +90,6 @@ class nscd (  $ensure = $nscd::params::ensure,
               $autorestart = $nscd::params::autorestart,
               $source = $nscd::params::source,
               $template = $nscd::params::template,
-              $source_dir = $nscd::params::source_dir,
-              $source_dir_purge = $nscd::params::source_dir_purge,
               $parameters = {},
               $parameters_passwd = {},
               $parameters_group = {},
@@ -115,16 +107,6 @@ class nscd (  $ensure = $nscd::params::ensure,
   $service_status_real = $service_status ? {
     'unmanaged' => undef,
     default     => $service_status
-  }
-
-  # source_dir and source_dir_purge is provided as default
-  # however for this service which only relies on one
-  # configuration file, it does not make sense
-  if $source_dir != undef {
-    notice("Parameter ${source_dir} is currently not used in this module.")
-  }
-  if $source_dir_purge != undef {
-    notice("Parameter ${source_dir_purge} is currently not used in this module.")
   }
 
   # Manages automatic upgrade behavior
