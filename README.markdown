@@ -1,4 +1,5 @@
 # nscd
+[![Build Status](https://travis-ci.org/jlyheden/puppet-nscd.png)](https://travis-ci.org/jlyheden/puppet-nscd)
 
 This is the Puppet module for NSCD - Name Service Cache Daemon.
 NSCD is used to cache system database lookups such as DNS queries,
