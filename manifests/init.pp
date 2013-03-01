@@ -97,8 +97,10 @@ class nscd (  $ensure = $nscd::params::ensure,
               $parameters_services = {} ) inherits nscd::params {
 
   # Input validation
-  validate_re($ensure,[ 'present', 'absent', 'purge' ])
-  validate_re($service_status, [ 'running', 'stopped', 'unmanaged' ])
+  $allowed_ensure_values = [ 'present', 'absent', 'purge' ]
+  $allowed_service_statuses = [ 'running', 'stopped', 'unmanaged' ]
+  validate_re($ensure, $allowed_ensure_values)
+  validate_re($service_status, $allowed_service_statuses)
   validate_bool($autoupgrade)
   validate_bool($autorestart)
   validate_hash($parameters)
