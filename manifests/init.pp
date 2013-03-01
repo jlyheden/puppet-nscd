@@ -83,52 +83,86 @@
 #
 # Johan Lyheden <johan.lyheden@artificial-solutions.com>
 #
-class nscd (  $ensure = $nscd::params::ensure,
-              $service_enable = $nscd::params::service_enable,
-              $service_status = $nscd::params::service_status,
-              $autoupgrade = $nscd::params::autoupgrade,
-              $autorestart = $nscd::params::autorestart,
-              $source = $nscd::params::source,
-              $template = $nscd::params::template,
-              $parameters = {},
-              $parameters_passwd = {},
-              $parameters_group = {},
-              $parameters_hosts = {},
-              $parameters_services = {} ) inherits nscd::params {
+class nscd (
+  $ensure               = 'UNDEF',
+  $service_enable       = 'UNDEF',
+  $service_status       = 'UNDEF',
+  $autoupgrade          = 'UNDEF',
+  $autorestart          = 'UNDEF',
+  $source               = 'UNDEF',
+  $template             = 'UNDEF',
+  $parameters           = {},
+  $parameters_passwd    = {},
+  $parameters_group     = {},
+  $parameters_hosts     = {},
+  $parameters_services  = {}
+) {
+
+  include nscd::params
+
+  # param assignment to support 2.6
+  $ensure_real = $ensure ? {
+    'UNDEF' => $nscd::params::ensure,
+    default => $ensure
+  }
+  $service_enable_real = $service_enable ? {
+    'UNDEF' => $nscd::params::service_enable,
+    default => $service_enable
+  }
+  $service_status_real = $service_status ? {
+    'UNDEF' => $nscd::params::service_status,
+    default => $service_status
+  }
+  $autoupgrade_real = $autoupgrade ? {
+    'UNDEF' => $nscd::params::autoupgrade,
+    default => $autoupgrade
+  }
+  $autorestart_real = $autorestart ? {
+    'UNDEF' => $nscd::params::autorestart,
+    default => $autorestart
+  }
+  $source_real = $source ? {
+    'UNDEF' => $nscd::params::source,
+    default => $source
+  }
+  $template_real = $template ? {
+    'UNDEF' => $nscd::params::template,
+    default => $template
+  }
 
   # Input validation
-  $allowed_ensure_values = [ 'present', 'absent', 'purge' ]
+  $allowed_ensure_values = [ 'present', 'absent', 'purged' ]
   $allowed_service_statuses = [ 'running', 'stopped', 'unmanaged' ]
-  validate_re($ensure, $allowed_ensure_values)
-  validate_re($service_status, $allowed_service_statuses)
-  validate_bool($autoupgrade)
-  validate_bool($autorestart)
+  validate_re($ensure_real, $allowed_ensure_values)
+  validate_re($service_status_real, $allowed_service_statuses)
+  validate_bool($autoupgrade_real)
+  validate_bool($autorestart_real)
   validate_hash($parameters)
 
   # 'unmanaged' is an unknown service state
-  $service_status_real = $service_status ? {
+  $ensure_service = $service_status_real ? {
     'unmanaged' => undef,
-    default     => $service_status
+    default     => $service_status_real
   }
 
   # Manages automatic upgrade behavior
-  if $ensure == 'present' and $autoupgrade == true {
+  if $ensure_real == 'present' and $autoupgrade_real == true {
     $ensure_package = 'latest'
   } else {
-    $ensure_package = $ensure
+    $ensure_package = $ensure_real
   }
 
-  case $ensure {
+  case $ensure_real {
 
     # If software should be installed
     present: {
-      if $autorestart == true {
+      if $autorestart_real == true {
         Service['nscd/service'] { subscribe => File['nscd/config'] }
       }
-      if $source == undef {
-        File['nscd/config'] { content => template($template) }
+      if $source_real == undef {
+        File['nscd/config'] { content => template($template_real) }
       } else {
-        File['nscd/config'] { source => $source }
+        File['nscd/config'] { source => $source_real }
       }
       File {
         owner   => root,
@@ -138,9 +172,9 @@ class nscd (  $ensure = $nscd::params::ensure,
         before  => Service['nscd/service']
       }
       service { 'nscd/service':
-        ensure  => $service_status_real,
+        ensure  => $ensure_service,
         name    => $nscd::params::service,
-        enable  => $service_enable,
+        enable  => $service_enable_real,
         require => [ Package['nscd'], File['nscd/config' ] ]
       }
       file { 'nscd/config':
@@ -163,7 +197,7 @@ class nscd (  $ensure = $nscd::params::ensure,
 
     # Catch all, should not end up here due to input validation
     default: {
-      fail("Unsupported ensure value ${ensure}")
+      fail("Unsupported ensure value ${ensure_real}")
     }
   }
 
