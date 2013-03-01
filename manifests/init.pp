@@ -122,11 +122,6 @@ class nscd (  $ensure = $nscd::params::ensure,
 
     # If software should be installed
     present: {
-      if $autoupgrade == true {
-        Package['nscd'] { ensure => latest }
-      } else {
-        Package['nscd'] { ensure => present }
-      }
       if $autorestart == true {
         Service['nscd/service'] { subscribe => File['nscd/config'] }
       }
@@ -164,7 +159,6 @@ class nscd (  $ensure = $nscd::params::ensure,
 
     # If software should be uninstalled
     absent,purge: {
-      Package['nscd'] { ensure => $ensure }
     }
 
     # Catch all, should not end up here due to input validation
@@ -174,7 +168,8 @@ class nscd (  $ensure = $nscd::params::ensure,
   }
 
   package { 'nscd':
-    name    => $nscd::params::package
+    ensure  => $ensure_package,
+    name    => $nscd::params::package,
   }
 
 }
