@@ -4,7 +4,6 @@
 #
 class nscd::params {
 
-  # 
   $ensure = present
   $service_enable = true
   $service_status = running
@@ -12,12 +11,10 @@ class nscd::params {
   $autorestart = true
   $source = undef
   $template = 'nscd/nscd.conf.erb'
-  $source_dir = undef
-  $source_dir_purge = undef
-  
+
   # This mandates which distributions are supported
   # To add support for other distributions simply add
-  # a matching regex line to the operatingsystem fact
+  # another match below
   case $::lsbdistcodename {
     lucid: {
       $package = 'nscd'
@@ -27,7 +24,7 @@ class nscd::params {
       $cache_dir = '/var/cache/nscd'
     }
     default: {
-      fail("Unsupported operatingsystem ${::operatingsystem}")
+      fail("Unsupported lsbdistcodename ${::lsbdistcodename}")
     }
   }
 

@@ -159,18 +159,18 @@ class nscd (  $ensure = $nscd::params::ensure,
         path    => $nscd::params::cache_dir
       }
     }
-    
+
     # If software should be uninstalled
     absent,purge: {
       Package['nscd'] { ensure => $ensure }
     }
-    
+
     # Catch all, should not end up here due to input validation
     default: {
       fail("Unsupported ensure value ${ensure}")
     }
   }
-  
+
   package { 'nscd':
     name    => $nscd::params::package
   }
