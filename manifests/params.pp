@@ -15,8 +15,8 @@ class nscd::params {
   # This mandates which distributions are supported
   # To add support for other distributions simply add
   # another match below
-  case $::lsbdistcodename {
-    lucid: {
+  case $::operatingsystem {
+    'Ubuntu','Debian': {
       $package = 'nscd'
       $service = 'nscd'
       $config_file = '/etc/nscd.conf'
@@ -24,7 +24,7 @@ class nscd::params {
       $cache_dir = '/var/cache/nscd'
     }
     default: {
-      fail("Unsupported lsbdistcodename ${::lsbdistcodename}")
+      fail("Unsupported operatingsystem ${::operatingsystem}")
     }
   }
 

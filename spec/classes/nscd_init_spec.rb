@@ -106,18 +106,14 @@ describe 'nscd' do
     end
   end
 
-  context 'hardy should fail' do
+  context 'with operatingsystem => beos' do
     let (:facts) { {
-      :lsbdistcodename  => 'hardy',
-      :operatingsystem  => 'Ubuntu',
-    } }
-    let (:params) { {
-      :ensure    => 'absent',
+      :operatingsystem  => 'beos',
     } }
     it do
       expect {
         should contain_class('nscd')
-      }.to raise_error(Puppet::Error,/Unsupported lsbdistcodename hardy/)
+      }.to raise_error(Puppet::Error,/Unsupported operatingsystem beos/)
     end
   end
 
