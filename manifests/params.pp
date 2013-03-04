@@ -4,12 +4,14 @@
 #
 class nscd::params {
 
+  $allowed_ensure_values = [ 'present', 'absent', 'purged' ]
+  $allowed_service_statuses = [ 'running', 'stopped', 'unmanaged' ]
   $ensure = present
   $service_enable = true
   $service_status = running
   $autoupgrade = false
   $autorestart = true
-  $source = undef
+  $source = ''
   $template = 'nscd/nscd.conf.erb'
 
   # This mandates which distributions are supported

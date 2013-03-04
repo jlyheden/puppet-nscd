@@ -28,12 +28,11 @@
 #   Valid values: <tt>true</tt>, <tt>false</tt>
 #
 # [*source*]
-#   Path to static Puppet file to use
+#   Path to static Puppet file to populate nscd.conf
 #   Valid values: <tt>puppet:///modules/mymodule/path/to/file.conf</tt>
 #
-# [*template*]
-#   Path to ERB puppet template file to use
-#   Valid values: <tt>mymodule/path/to/file.conf.erb</tt>
+# [*content*]
+#   Content to populate nscd.conf
 #
 # [*parameters*]
 #   Global nscd settings (man 5 nscd.conf)
@@ -90,7 +89,7 @@ class nscd (
   $autoupgrade          = 'UNDEF',
   $autorestart          = 'UNDEF',
   $source               = 'UNDEF',
-  $template             = 'UNDEF',
+  $content              = 'UNDEF',
   $parameters           = {},
   $parameters_passwd    = {},
   $parameters_group     = {},
@@ -125,19 +124,22 @@ class nscd (
     'UNDEF' => $nscd::params::source,
     default => $source
   }
-  $template_real = $template ? {
-    'UNDEF' => $nscd::params::template,
-    default => $template
-  }
 
   # Input validation
-  $allowed_ensure_values = [ 'present', 'absent', 'purged' ]
-  $allowed_service_statuses = [ 'running', 'stopped', 'unmanaged' ]
-  validate_re($ensure_real, $allowed_ensure_values)
-  validate_re($service_status_real, $allowed_service_statuses)
+  validate_re($ensure_real, $nscd::params::allowed_ensure_values)
+  validate_re($service_status_real, $nscd::params::allowed_service_statuses)
   validate_bool($autoupgrade_real)
   validate_bool($autorestart_real)
   validate_hash($parameters)
+  if $source_real != '' and $content_real != '' {
+    fail ('Only one of parameter source and content must be set')
+  }
+
+  # Template rendering after validation
+  $content_real = $content ? {
+    'UNDEF' => template($nscd::params::template),
+    default => $content
+  }
 
   # 'unmanaged' is an unknown service state
   $ensure_service = $service_status_real ? {
@@ -157,21 +159,22 @@ class nscd (
     # If software should be installed
     present: {
       if $autorestart_real == true {
-        Service['nscd/service'] { subscribe => File['nscd/config'] }
+        Service['nscd'] { subscribe => File['nscd/config'] }
       }
-      if $source_real == undef {
-        File['nscd/config'] { content => template($template_real) }
-      } else {
+      if $source_real != '' {
         File['nscd/config'] { source => $source_real }
+      }
+      elsif $content_real != '' {
+        File['nscd/config'] { content => $content_real }
       }
       File {
         owner   => root,
         group   => root,
         mode    => '0644',
         require => Package['nscd'],
-        before  => Service['nscd/service']
+        before  => Service['nscd']
       }
-      service { 'nscd/service':
+      service { 'nscd':
         ensure  => $ensure_service,
         name    => $nscd::params::service,
         enable  => $service_enable_real,
